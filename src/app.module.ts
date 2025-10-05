@@ -4,6 +4,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './shareds/config/config.module';
 import { DatabaseModule } from './shareds/database/database.module';
+import { UserModule } from './modules/user/user.module';
+import { CloudinaryModule } from './shareds/cloudinary/cloudinary.module';
+import { MailModule } from './shareds/mail/mail.module';
 
 @Module({
   imports: [
@@ -13,6 +16,9 @@ import { DatabaseModule } from './shareds/database/database.module';
     }),
     ConfigModule,
     DatabaseModule,
+    UserModule,
+    CloudinaryModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

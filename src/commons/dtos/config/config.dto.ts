@@ -17,5 +17,31 @@ export class EnvironmentVariables {
   @IsString()
   DATABASE_URL?: string;
 
-  // Add more env vars as needed
+  @IsOptional()
+  @IsString()
+  JWT_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
+  JWT_EXPIRATION?: string;
+
+  @IsOptional()
+  @IsString()
+  CLOUDINARY_CLOUD_NAME?: string;
+
+  @IsOptional()
+  @IsString()
+  CLOUDINARY_API_KEY?: string;
+
+  @IsOptional()
+  @IsString()
+  CLOUDINARY_API_SECRET?: string;
+
+  @IsOptional()
+  @IsString()
+  EMAIL_USER?: string;
+
+  @IsOptional()
+  @IsString()
+  EMAIL_PASSWORD?: string;
 }
