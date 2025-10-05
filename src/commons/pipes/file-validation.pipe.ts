@@ -1,15 +1,25 @@
 import { Injectable, BadRequestException, PipeTransform } from '@nestjs/common';
 
+interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
+}
+
 @Injectable()
-export class FileValidationPipe implements PipeTransform {
+export class FileValidationPipe
+  implements PipeTransform<MulterFile | undefined, MulterFile | undefined>
+{
   private readonly maxSize = 5 * 1024 * 1024;
 
-  transform(file: Express.Multer.File): Express.Multer.File {
+  transform(file: MulterFile | undefined): MulterFile | undefined {
     if (!file) {
-      throw new BadRequestException('File is required');
+      return undefined;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (file.size > this.maxSize) {
       throw new BadRequestException('File size must be less than 5MB');
     }
@@ -22,7 +32,6 @@ export class FileValidationPipe implements PipeTransform {
       'image/webp',
     ];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     if (!allowedMimes.includes(file.mimetype)) {
       throw new BadRequestException('Only image files are allowed');
     }

@@ -218,7 +218,7 @@ export class UserService {
   async updateProfile(
     userId: string,
     updateUserDto: UpdateUserDto,
-    file?: Express.Multer.File,
+    file?: any,
   ) {
     const user = await this.databaseService.user.findUnique({
       where: { id: userId },

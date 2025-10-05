@@ -17,6 +17,7 @@ import {
   ApiOperation,
   ApiBearerAuth,
   ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import {
@@ -100,11 +101,29 @@ export class UserController {
   @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('avatar'))
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Update user profile with optional name and avatar',
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'New name for the user (optional)',
+          example: 'John Doe',
+        },
+        avatar: {
+          type: 'string',
+          format: 'binary',
+          description: 'Avatar image file (optional, max 5MB, only images)',
+        },
+      },
+    },
+  })
   @ApiOperation({ summary: 'Update user profile' })
   async updateProfile(
     @Req() req: { user: { userId: string } },
     @Body() updateUserDto: UpdateUserDto,
-    @UploadedFile(new FileValidationPipe()) file?: Express.Multer.File,
+    @UploadedFile(new FileValidationPipe()) file?: any,
   ) {
     return this.userService.updateProfile(req.user.userId, updateUserDto, file);
   }
