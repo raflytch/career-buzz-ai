@@ -12,15 +12,21 @@ import { CloudinaryService } from '../../shareds/cloudinary/cloudinary.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import * as bcrypt from 'bcrypt';
+import { RegisterDto } from './dtos/user-register.dto';
+import { LoginDto } from './dtos/user-login.dto';
 import {
-  RegisterDto,
-  LoginDto,
   VerifyOtpDto,
   ResetPasswordDto,
   ResendOtpDto,
   ForgotPasswordDto,
-} from './dtos/user-create.dto';
+} from './dtos/user-otp.dto';
 import { UpdateUserDto } from './dtos/user-update.dto';
+import {
+  AuthResponse,
+  MessageResponse,
+  ProfileResponse,
+} from './dtos/user-response.dto';
+import { MulterFile } from '../../commons/interfaces/multer.interface';
 
 @Injectable()
 export class UserService {
@@ -32,7 +38,7 @@ export class UserService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto): Promise<MessageResponse> {
     const existingUser = await this.databaseService.user.findUnique({
       where: { email: registerDto.email },
     });
@@ -60,7 +66,7 @@ export class UserService {
     return { message: 'Registration successful. Please verify your email.' };
   }
 
-  async verifyOtp(verifyOtpDto: VerifyOtpDto) {
+  async verifyOtp(verifyOtpDto: VerifyOtpDto): Promise<MessageResponse> {
     const cachedOtp = await this.cacheManager.get<string>(
       `otp:${verifyOtpDto.email}`,
     );
@@ -79,7 +85,7 @@ export class UserService {
     return { message: 'Email verified successfully' };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto): Promise<AuthResponse> {
     const user = await this.databaseService.user.findUnique({
       where: { email: loginDto.email },
     });
@@ -94,7 +100,7 @@ export class UserService {
 
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+       
       user.password,
     );
 
@@ -116,7 +122,7 @@ export class UserService {
     };
   }
 
-  async resendOtp(resendOtpDto: ResendOtpDto) {
+  async resendOtp(resendOtpDto: ResendOtpDto): Promise<MessageResponse> {
     const user = await this.databaseService.user.findUnique({
       where: { email: resendOtpDto.email },
     });
@@ -136,7 +142,9 @@ export class UserService {
     return { message: 'OTP resent successfully' };
   }
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+  async forgotPassword(
+    forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<MessageResponse> {
     const user = await this.databaseService.user.findUnique({
       where: { email: forgotPasswordDto.email },
     });
@@ -156,7 +164,9 @@ export class UserService {
     return { message: 'Reset password OTP sent successfully' };
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+  async resetPassword(
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<MessageResponse> {
     const cachedOtp = await this.cacheManager.get<string>(
       `reset-password:${resetPasswordDto.email}`,
     );
@@ -177,7 +187,9 @@ export class UserService {
     return { message: 'Password reset successfully' };
   }
 
-  async resendResetPasswordOtp(resendOtpDto: ResendOtpDto) {
+  async resendResetPasswordOtp(
+    resendOtpDto: ResendOtpDto,
+  ): Promise<MessageResponse> {
     const user = await this.databaseService.user.findUnique({
       where: { email: resendOtpDto.email },
     });
@@ -197,7 +209,7 @@ export class UserService {
     return { message: 'Reset password OTP resent successfully' };
   }
 
-  async getProfile(userId: string) {
+  async getProfile(userId: string): Promise<ProfileResponse> {
     const user = await this.databaseService.user.findUnique({
       where: { id: userId },
     });
@@ -218,8 +230,8 @@ export class UserService {
   async updateProfile(
     userId: string,
     updateUserDto: UpdateUserDto,
-    file?: any,
-  ) {
+    file?: MulterFile,
+  ): Promise<Omit<ProfileResponse, 'isVerified'>> {
     const user = await this.databaseService.user.findUnique({
       where: { id: userId },
     });

@@ -1,13 +1,5 @@
 import { Injectable, BadRequestException, PipeTransform } from '@nestjs/common';
-
-interface MulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  buffer: Buffer;
-}
+import { MulterFile } from '../interfaces/multer.interface';
 
 @Injectable()
 export class FileValidationPipe

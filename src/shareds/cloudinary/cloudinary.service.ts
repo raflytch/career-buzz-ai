@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import { MulterFile } from '../../commons/interfaces/multer.interface';
 
 @Injectable()
 export class CloudinaryService {
@@ -12,7 +13,7 @@ export class CloudinaryService {
     });
   }
 
-  async uploadFile(file: any): Promise<string> {
+  async uploadFile(file: MulterFile): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
@@ -23,7 +24,7 @@ export class CloudinaryService {
             else reject(new Error('Upload failed'));
           },
         )
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+         
         .end(file.buffer);
     });
   }
